@@ -49,7 +49,7 @@ function addEdgeToGraph(src, target) {
     target: target,
     size: 5,
     color: '#BBF',
-    type: 'curvedArrow'
+    type: 'arrow'
   }
   if(!edgesTo[target])
     edgesTo[target] = []
@@ -87,6 +87,21 @@ function getConfirmationConfidence(nodeId) {
       noOfConfirmations++
   }
   return noOfConfirmations
+}
+
+function updateNodeColor() {
+  s.graph.nodes().forEach(node => {
+    id = parseInt(node.id)
+    if(getConfirmationConfidence(id) > 95 && edgesTo[i] && edgesTo[i].length>0) {
+      node.color = GREEN
+    }
+    else if(edgesTo[id] && edgesTo[id].length > 0) {
+      node.color = RED
+    }
+    else {
+      node.color = BLACK
+    }
+  })
 }
 
 var MAX_VERTICAL_NODES = 6
@@ -135,7 +150,7 @@ function getTwoTips() {
 var k = 3
 for(var i=0;i<10;i++) {
   var pendingNodes = []
-  var burst = Math.floor(Math.random() * 4)
+  var burst = Math.floor(Math.random() * 6)
   for(var j=0; j< burst; j++) {
     node = {
       id: `${k}`,
@@ -159,6 +174,8 @@ for(var i=0;i<10;i++) {
 }
 
 console.log(weightedRandomWalk(0))
+console.log(getConfirmationConfidence(14))
+updateNodeColor()
 // var numberOfHorizontalNodes = 3
 // var numberOfGreenNodes = numberOfHorizontalNodes * 2
 // var numberOfRedNodes = numberOfHorizontalNodes * 2
