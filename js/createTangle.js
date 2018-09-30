@@ -8,6 +8,10 @@ var edgesTo = {}
 
 var s = new sigma({
   container: 'container',
+  renderer: {
+    container: document.getElementById('container'),
+    type: sigma.renderers.canvas
+  },
   settings: {
     sideMargin: 0.3,
     minArrowSize: 9,
@@ -44,8 +48,8 @@ function addEdgeToGraph(src, target) {
     source: src,
     target: target,
     size: 5,
-    color: '#BB9',
-    type: 'arrow'
+    color: '#BBF',
+    type: 'curve'
   }
   if(!edgesTo[target])
     edgesTo[target] = []
@@ -66,6 +70,13 @@ function weightedChoice(array) {
     if(random <= 0)
       return array[i]
   }
+}
+
+function weightedRandomWalk(start) {
+  while(edgesTo[start] && edgesTo[start].length > 0) {
+    start = weightedChoice(edgesTo[start]).srcId
+  }
+  return start
 }
 
 var MAX_VERTICAL_NODES = 6
@@ -100,34 +111,44 @@ addEdgeToGraph('1','0')
 addEdgeToGraph('2','0')
 
 function getTwoTips() {
-  var tips = []
-  nodes = nodes.map(node => {
-    if(tips.length < 2 && node.id != '0') {
-      tips.push(node)
-      node.incoming += 1
-    }
-    return node
-  })
+  var tip1 = weightedRandomWalk(0)
+  var tip2 = tip1
+  for(var i=0;i<5000;i++) {
+    tip2 = weightedRandomWalk(0)
+    if(tip1 != tip2)
+      break
+  }
+  var tips = [getNodeByNodeId(tip1), getNodeByNodeId(tip2)]
   return tips
 }
 
-for(var i=0;i<10;i++) {
-  addNodeToGraph({
-    id: `${3+i}`,
-    label: `${3+i}`,
-    x: 2+parseInt(i/4),
-    y: 1+(i%4),
-    size: 1,
-    color: BLACK
-  })
+var k = 3
+for(var i=0;i<5;i++) {
+  var pendingNodes = []
+  var burst = Math.floor(Math.random() * 6)
+  for(var j=0; j< burst; j++) {
+    node = {
+      id: `${k}`,
+      label: `${k}`,
+      x: 2+parseInt(k/3),
+      y: 1+(k%3),
+      size: 1,
+      color: BLACK
+    }
+    pendingNodes.push(node)
+    addNodeToGraph(node)
+    k++;
+  }
 
-  var tips = getTwoTips()
-  console.log(i,'Got tips', tips[0].id, tips[1].id)
-  addEdgeToGraph(`${3+i}`, tips[0].id)
-  addEdgeToGraph(`${3+i}`, tips[1].id)
+  pendingTips = pendingNodes.map(node => getTwoTips())
+  for(var l=0; l< pendingTips.length; l++) {
+    console.log(pendingNodes[l])
+    addEdgeToGraph(pendingNodes[l].id, pendingTips[l][0].id)
+    addEdgeToGraph(pendingNodes[l].id, pendingTips[l][1].id)
+  }
 }
 
-console.log(weightedChoice(edgesTo[0]))
+console.log(weightedRandomWalk(0))
 // var numberOfHorizontalNodes = 3
 // var numberOfGreenNodes = numberOfHorizontalNodes * 2
 // var numberOfRedNodes = numberOfHorizontalNodes * 2
