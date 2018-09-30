@@ -49,7 +49,7 @@ function addEdgeToGraph(src, target) {
     target: target,
     size: 5,
     color: '#BBF',
-    type: 'curve'
+    type: 'curvedArrow'
   }
   if(!edgesTo[target])
     edgesTo[target] = []
@@ -123,15 +123,15 @@ function getTwoTips() {
 }
 
 var k = 3
-for(var i=0;i<5;i++) {
+for(var i=0;i<10;i++) {
   var pendingNodes = []
-  var burst = Math.floor(Math.random() * 6)
+  var burst = Math.floor(Math.random() * 4)
   for(var j=0; j< burst; j++) {
     node = {
       id: `${k}`,
       label: `${k}`,
-      x: 2+parseInt(k/3),
-      y: 1+(k%3),
+      x: 2+k,
+      y: k%4,
       size: 1,
       color: BLACK
     }
