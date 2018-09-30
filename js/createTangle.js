@@ -79,6 +79,16 @@ function weightedRandomWalk(start) {
   return start
 }
 
+function getConfirmationConfidence(nodeId) {
+  var noOfConfirmations = 0
+  for(var i=0; i<100; i++) {
+    var tip = weightedRandomWalk(0)
+    if(s.graph.astar(String(tip), String(nodeId)))
+      noOfConfirmations++
+  }
+  return noOfConfirmations
+}
+
 var MAX_VERTICAL_NODES = 6
 var genesisNode = {
   id: '0',
