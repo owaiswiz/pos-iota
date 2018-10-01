@@ -16,6 +16,9 @@
 	  right: 50px;
 	  bottom: 20px;
 	}
+	#buttons > button {
+	  margin: auto 2rem;
+	}
 	.createTransaction{
 	  padding: 1.2rem 2.5rem;
 	  border-radius: 50px;
@@ -24,17 +27,24 @@
 	  background: transparent;
 	  color: #4CAF50;
 	  font-size: 1.05rem;
+	  transition-duration: 0.3s;
+	  cursor: pointer;
+	  font-weight: 600;
+	}
+	.createTransaction:hover {
+	  color: white;
+	  background: #4CAF50;
 	}
 	.hidden {
-		display: none;
+	  display: none;
 	}
   </style>
 </head>
 <body>
   <div id="container"></div>
   <div id="buttons">
-	  <button class="createTransaction">Create Transaction</button>
-	  <button class="createTransaction endBatch">Create Transaction And End Batch</button>
+	<button class="createTransaction">Create Transaction</button>
+	<button class="createTransaction endBatch">Create Transaction And End Batch</button>
   </div>
   <script src="./js/sigma.min.js"></script>
   <script src="./js/sigma.canvas.edges.curvedArrow.js"></script>
