@@ -108,15 +108,25 @@ function updateNodeColor() {
   })
 }
 
-var MAX_VERTICAL_NODES = 6
-var genesisNode = {
-  id: '0',
-  label: "Genesis",
-  x: 0,
-  y: MAX_VERTICAL_NODES/2,
-  size: 1,
-  color: GREEN,
-  incoming: 2
+var xVal = 0
+var yVal = 0
+function createTransaction(endBatch=false) {
+  var node = {
+    id: `${nodes.length}`,
+    label: `Node: ${nodes.length}`,
+    x: xVal,
+    y: yVal,
+    size: 1,
+    color: BLACK,
+  }
+  if(endBatch) {
+    xVal++;
+    yVal = 0
+  }
+  else
+    yVal++;
+  addNodeToGraph(node)
+  return node
 }
 
 addNodeToGraph(genesisNode)
