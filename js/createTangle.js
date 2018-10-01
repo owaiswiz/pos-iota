@@ -13,7 +13,7 @@ var s = new sigma({
     type: sigma.renderers.canvas
   },
   settings: {
-    sideMargin: 0.3,
+    sideMargin: 1.5,
     minArrowSize: 9,
     minEdgeSize: 3.0,
     maxEdgeSize: 3.0,
@@ -91,15 +91,19 @@ function getConfirmationConfidence(nodeId) {
 
 function updateNodeColor() {
   s.graph.nodes().forEach(node => {
-    id = parseInt(node.id)
-    if(getConfirmationConfidence(id) > 95 && edgesTo[i] && edgesTo[i].length>0) {
+    var id = parseInt(node.id)
+    var confirmationConfidence = getConfirmationConfidence(id)
+    if(confirmationConfidence > 90 && edgesTo[id] && edgesTo[id].length>0) {
       node.color = GREEN
+      node.label = String(confirmationConfidence)
     }
     else if(edgesTo[id] && edgesTo[id].length > 0) {
       node.color = RED
+      node.label = String(confirmationConfidence)
     }
     else {
       node.color = BLACK
+      node.label = String(confirmationConfidence)
     }
   })
 }
