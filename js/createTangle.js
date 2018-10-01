@@ -81,12 +81,12 @@ function weightedRandomWalk(start) {
 
 function getConfirmationConfidence(nodeId) {
   var noOfConfirmations = 0
-  for(var i=0; i<100; i++) {
+  for(var i=0; i<200; i++) {
     var tip = weightedRandomWalk(0)
     if(s.graph.astar(String(tip), String(nodeId)))
       noOfConfirmations++
   }
-  return noOfConfirmations
+  return noOfConfirmations/2
 }
 
 function updateNodeColor() {
