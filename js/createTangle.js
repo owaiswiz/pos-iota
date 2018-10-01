@@ -129,23 +129,11 @@ function createTransaction(endBatch=false) {
   return node
 }
 
-addNodeToGraph(genesisNode)
 
-addNodeToGraph({
-  id: '1',
-  x: 1,
-  y: 2,
-  size: 1,
-  color: BLACK
-})
+createTransaction(true)
 
-addNodeToGraph({
-  id: '2',
-  x: 1,
-  y: 4,
-  size: 1,
-  color: BLACK
-})
+createTransaction()
+createTransaction(true)
 addEdgeToGraph('1','0')
 addEdgeToGraph('2','0')
 
@@ -161,22 +149,11 @@ function getTwoTips() {
   return tips
 }
 
-var k = 3
-for(var i=0;i<10;i++) {
+for(var i=0;i<12;i++) {
   var pendingNodes = []
-  var burst = Math.floor(Math.random() * 6)
+  var burst = Math.floor(3 + Math.random() * 4)
   for(var j=0; j< burst; j++) {
-    node = {
-      id: `${k}`,
-      label: `${k}`,
-      x: 2+k,
-      y: k%4,
-      size: 1,
-      color: BLACK
-    }
-    pendingNodes.push(node)
-    addNodeToGraph(node)
-    k++;
+    pendingNodes.push(createTransaction(j+1 >= burst ? true : false))
   }
 
   pendingTips = pendingNodes.map(node => getTwoTips())
@@ -187,8 +164,6 @@ for(var i=0;i<10;i++) {
   }
 }
 
-console.log(weightedRandomWalk(0))
-console.log(getConfirmationConfidence(14))
 updateNodeColor()
 // var numberOfHorizontalNodes = 3
 // var numberOfGreenNodes = numberOfHorizontalNodes * 2
@@ -240,3 +215,9 @@ updateNodeColor()
 
 // Finally, let's ask our sigma instance to refresh:
 s.refresh();
+
+document.querySelectorAll('.createTransaction').forEach(element => element.addEventListener("click", (e) => {
+  var endBatch = e.target.classList.contains('endBatch')
+  createTransaction(endBatch)
+  s.refresh()
+}))
