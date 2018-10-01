@@ -11,10 +11,31 @@
       width: 100%;
       height: 100%;
     }
+	#buttons {
+	  position: absolute;
+	  right: 50px;
+	  bottom: 20px;
+	}
+	.createTransaction{
+	  padding: 1.2rem 2.5rem;
+	  border-radius: 50px;
+	  border: 2px solid #4CAF50;
+	  outline: none;
+	  background: transparent;
+	  color: #4CAF50;
+	  font-size: 1.05rem;
+	}
+	.hidden {
+		display: none;
+	}
   </style>
 </head>
 <body>
   <div id="container"></div>
+  <div id="buttons">
+	  <button class="createTransaction">Create Transaction</button>
+	  <button class="createTransaction endBatch">Create Transaction And End Batch</button>
+  </div>
   <script src="./js/sigma.min.js"></script>
   <script src="./js/sigma.canvas.edges.curvedArrow.js"></script>
   <script src="./js/sigma.canvas.edgehovers.curvedArrow.js"></script>
