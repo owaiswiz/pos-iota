@@ -168,56 +168,21 @@ function startApproval() {
   pendingNodes = []
 }
 
+function startApprovalPOS() {
+  var allTips = s.graph.nodes().filter(node => {
+    var nodeId = parseInt(node.id)
+    if(edgesFrom[nodeId].length > 0 && edgesTo[nodeId] == 0 )
+      return true
+  })
+  pendingNodes.map(node => {
+    var availableTips = allTips.slice(0)
+    var tips = [weightedChoice(availableTips)]
+    availableTips.splice(availableTips.indexOf(tips[0]), 1)
+    tips.push(weightedChoice(availableTips))
+  })
+}
+
 updateNodeColor()
-// var numberOfHorizontalNodes = 3
-// var numberOfGreenNodes = numberOfHorizontalNodes * 2
-// var numberOfRedNodes = numberOfHorizontalNodes * 2
-
-// for(var i=0; i<20; i++) {
-//   nodes.push({
-//     id: `n${i}`,
-//     label: `Stake: ${parseInt(Math.random()*10000)}`,
-//     y: i % numberOfHorizontalNodes,
-//     x: parseInt(i/numberOfHorizontalNodes),
-//     size: 1,
-//     color: i < numberOfGreenNodes ? '#0F0' : (i< numberOfRedNodes + numberOfGreenNodes ? '#F00' : '#000'),
-//     status: i < numberOfGreenNodes ? 'confirmed' : (i< numberOfRedNodes + numberOfGreenNodes ? 'pending' : 'new') 
-//   })
-// }
-
-
-// nodes.map((node) => {
-//   addNodeToGraph(node);
-// })
-
-
-// var edges = {}
-// nodes.map(node => edges[node.id] = [])
-
-// nodes.slice(1).map((source) => {
-//   if(source.status == 'confirmed') {
-//     while(edges[source].length < 2)
-//       nodes.map((target) => {
-//         if(source.id != target.id && target.status != 'new')
-//           addEdgeToGraph({
-//             source: source.id,
-//             target: target.id,
-//             id: `e${source.id}${target.id}`
-//           });
-//       })
-//   }
-// })
-
-// console.log(s.graph.astar('n0','n5'))
-// Then, let's add some data to display:
-// }).addEdge({
-//   id: 'e0',
-//   // Reference extremities:
-//   source: 'n0',
-//   target: 'n1'
-// });
-
-// Finally, let's ask our sigma instance to refresh:
 s.refresh();
 
 document.querySelectorAll('.createTransaction').forEach(element => element.addEventListener("click", (e) => {
@@ -228,6 +193,12 @@ document.querySelectorAll('.createTransaction').forEach(element => element.addEv
 
 document.querySelector('.startApproval').addEventListener('click', (e) => {
   startApproval()
+  updateNodeColor()
+  s.refresh()
+})
+
+document.querySelector('.startApprovalPOS').addEventListener('click', (e) => {
+  startApprovalPOS()
   updateNodeColor()
   s.refresh()
 })
