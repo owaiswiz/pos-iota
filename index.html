@@ -19,7 +19,7 @@
 	#buttons > button {
 	  margin: auto 2rem;
 	}
-	.createTransaction{
+	button {
 	  padding: 1.2rem 2.5rem;
 	  border-radius: 50px;
 	  border: 2px solid #4CAF50;
@@ -31,7 +31,7 @@
 	  cursor: pointer;
 	  font-weight: 600;
 	}
-	.createTransaction:hover {
+	button:hover {
 	  color: white;
 	  background: #4CAF50;
 	}
@@ -45,6 +45,7 @@
   <div id="buttons">
 	<button class="createTransaction">Create Transaction</button>
 	<button class="createTransaction endBatch">Create Transaction And End Batch</button>
+	<button class="startApproval">Start Approval</button>
   </div>
   <script src="./js/sigma.min.js"></script>
   <script src="./js/sigma.canvas.edges.curvedArrow.js"></script>

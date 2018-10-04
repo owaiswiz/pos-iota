@@ -3,6 +3,7 @@ var GREEN = '#0F0'
 var RED = '#F00'
 var BLACK = '#000'
 var nodes = []
+var pendingNodes = []
 var edges = []
 var edgesTo = {}
 
@@ -150,18 +151,20 @@ function getTwoTips() {
 }
 
 for(var i=0;i<12;i++) {
-  var pendingNodes = []
   var burst = Math.floor(3 + Math.random() * 4)
   for(var j=0; j< burst; j++) {
     pendingNodes.push(createTransaction(j+1 >= burst ? true : false))
   }
+  startApproval()
+}
 
-  pendingTips = pendingNodes.map(node => getTwoTips())
+function startApproval() {
+  var pendingTips = pendingNodes.map(node => getTwoTips())
   for(var l=0; l< pendingTips.length; l++) {
-    console.log(pendingNodes[l])
     addEdgeToGraph(pendingNodes[l].id, pendingTips[l][0].id)
     addEdgeToGraph(pendingNodes[l].id, pendingTips[l][1].id)
   }
+  pendingNodes = []
 }
 
 updateNodeColor()
@@ -218,6 +221,12 @@ s.refresh();
 
 document.querySelectorAll('.createTransaction').forEach(element => element.addEventListener("click", (e) => {
   var endBatch = e.target.classList.contains('endBatch')
-  createTransaction(endBatch)
+  pendingNodes.push(createTransaction(endBatch))
   s.refresh()
 }))
+
+document.querySelector('.startApproval').addEventListener('click', (e) => {
+  startApproval()
+  updateNodeColor()
+  s.refresh()
+})
