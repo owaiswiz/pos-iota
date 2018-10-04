@@ -6,6 +6,7 @@ var nodes = []
 var pendingNodes = []
 var edges = []
 var edgesTo = {}
+var edgesFrom = {}
 
 var s = new sigma({
   container: 'container',
@@ -39,6 +40,8 @@ function addNodeToGraph(node) {
     node.incoming = 0
   if(!node.weight)
     node.weight = parseInt(Math.random()*1000)
+  edgesTo[parseInt(node.id)] = []
+  edgesFrom[parseInt(node.id)] = []
   nodes.push(node)
   s.graph.addNode(node);
 }
@@ -52,10 +55,8 @@ function addEdgeToGraph(src, target) {
     color: '#BBF',
     type: 'arrow'
   }
-  if(!edgesTo[target])
-    edgesTo[target] = []
-  var srcAndWeight = {}
   edgesTo[target].push({srcId: src, weight: getWeightByNodeId(src)})
+  edgesFrom[src].push({srcId: src})
   edges.push(edge)
   s.graph.addEdge(edge)
 }
