@@ -1,12 +1,14 @@
 // Let's first initialize sigma:
-var GREEN = '#0F0'
 var RED = '#F00'
+var GREEN = '#0F0'
+var BLUE = '#00F'
 var BLACK = '#000'
 var nodes = []
 var pendingNodes = []
 var edges = []
 var edgesTo = {}
 var edgesFrom = {}
+var delay = 500
 
 var s = new sigma({
   container: 'container',
@@ -22,6 +24,10 @@ var s = new sigma({
   }
 });
 
+function sleep(ms=delay) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function getNodeByNodeId(nodeId) {
   for(var i=0; i< nodes.length; i++) 
     if(nodes[i].id == nodeId)
@@ -35,6 +41,11 @@ function getWeightByNodeId(nodeId) {
     return node.weight
   return 0
 }
+
+function findNodeFromGraph(nodeId) {
+  return s.graph.nodes().find(node => node.id == nodeId)
+}
+
 function addNodeToGraph(node) {
   if(!node.incoming)
     node.incoming = 0
@@ -51,7 +62,7 @@ function addEdgeToGraph(src, target) {
     id: edges.length,
     source: src,
     target: target,
-    size: 5,
+    size: 1,
     color: '#BBF',
     type: 'arrow'
   }
@@ -151,7 +162,7 @@ function getTwoTips() {
   return tips
 }
 
-for(var i=0;i<12;i++) {
+for(var i=0;i<3;i++) {
   var burst = Math.floor(3 + Math.random() * 4)
   for(var j=0; j< burst; j++) {
     pendingNodes.push(createTransaction(j+1 >= burst ? true : false))
@@ -168,18 +179,44 @@ function startApproval() {
   pendingNodes = []
 }
 
-function startApprovalPOS() {
+function changeNodeColor(nodeId, color) {
+  findNodeFromGraph(nodeId).color = color
+  s.refresh()
+}
+
+
+async function startApprovalPOS() {
   var allTips = s.graph.nodes().filter(node => {
     var nodeId = parseInt(node.id)
     if(edgesFrom[nodeId].length > 0 && edgesTo[nodeId] == 0 )
       return true
   })
-  pendingNodes.map(node => {
+  for(var i=0; i< pendingNodes.length; i++) {
+    node = pendingNodes[i]
+
+    changeNodeColor(node.id, "#DDD")
+    await sleep()
+
     var availableTips = allTips.slice(0)
     var tips = [weightedChoice(availableTips)]
     availableTips.splice(availableTips.indexOf(tips[0]), 1)
     tips.push(weightedChoice(availableTips))
-  })
+
+    changeNodeColor(tips[0].id, BLUE)
+    await sleep()
+
+    changeNodeColor(tips[1].id, BLUE)
+    await sleep()
+
+    addEdgeToGraph(node.id, tips[0].id)
+    addEdgeToGraph(node.id, tips[1].id)
+    await sleep()
+
+    updateNodeColor()
+    s.refresh()
+    await sleep()
+  }
+  pendingNodes = []
 }
 
 updateNodeColor()
@@ -199,6 +236,5 @@ document.querySelector('.startApproval').addEventListener('click', (e) => {
 
 document.querySelector('.startApprovalPOS').addEventListener('click', (e) => {
   startApprovalPOS()
-  updateNodeColor()
   s.refresh()
 })
