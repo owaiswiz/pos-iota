@@ -3,6 +3,7 @@ var RED = '#F00'
 var GREEN = '#0F0'
 var BLUE = '#00F'
 var BLACK = '#000'
+var YELLOW = '#FF0'
 var nodes = []
 var pendingNodes = []
 var edges = []
@@ -17,7 +18,7 @@ var s = new sigma({
     type: sigma.renderers.canvas
   },
   settings: {
-    sideMargin: 1.5,
+    sideMargin: 1.0,
     minArrowSize: 9,
     minEdgeSize: 3.0,
     maxEdgeSize: 3.0,
@@ -51,6 +52,7 @@ function addNodeToGraph(node) {
     node.incoming = 0
   if(!node.weight)
     node.weight = parseInt(Math.random()*1000)
+  node.label = `Stake: ${node.weight}`
   edgesTo[parseInt(node.id)] = []
   edgesFrom[parseInt(node.id)] = []
   nodes.push(node)
@@ -108,45 +110,44 @@ function updateNodeColor() {
     var confirmationConfidence = getConfirmationConfidence(id)
     if(confirmationConfidence > 90 && edgesTo[id] && edgesTo[id].length>0) {
       node.color = GREEN
-      node.label = String(confirmationConfidence)
     }
     else if(edgesTo[id] && edgesTo[id].length > 0) {
       node.color = RED
-      node.label = String(confirmationConfidence)
     }
     else {
       node.color = BLACK
-      node.label = String(confirmationConfidence)
     }
   })
 }
 
 var xVal = 0
 var yVal = 0
-function createTransaction(endBatch=false) {
+function endBatch() {
+  xVal++
+  yVal = 0
+}
+
+function createTransaction() {
   var node = {
     id: `${nodes.length}`,
-    label: `Node: ${nodes.length}`,
     x: xVal,
     y: yVal,
     size: 1,
     color: BLACK,
   }
-  if(endBatch) {
-    xVal++;
-    yVal = 0
-  }
-  else
-    yVal++;
+  yVal++
   addNodeToGraph(node)
   return node
 }
 
 
-createTransaction(true)
+createTransaction()
+endBatch()
 
 createTransaction()
-createTransaction(true)
+createTransaction()
+endBatch()
+
 addEdgeToGraph('1','0')
 addEdgeToGraph('2','0')
 
@@ -165,7 +166,8 @@ function getTwoTips() {
 for(var i=0;i<3;i++) {
   var burst = Math.floor(3 + Math.random() * 4)
   for(var j=0; j< burst; j++) {
-    pendingNodes.push(createTransaction(j+1 >= burst ? true : false))
+    pendingNodes.push(createTransaction())
+    if(j+1>=burst) endBatch()
   }
   startApproval()
 }
@@ -179,9 +181,22 @@ function startApproval() {
   pendingNodes = []
 }
 
+function changeStatus(status) {
+  document.querySelector('.status-value').innerText = status
+}
+
 function changeNodeColor(nodeId, color) {
   findNodeFromGraph(nodeId).color = color
   s.refresh()
+}
+
+async function blinkNode(nodeId, finalColor=BLUE, tempColor=YELLOW) {
+  for(var i=0; i<2; i++) {
+    changeNodeColor(nodeId, tempColor)
+    await sleep(delay/5)
+    changeNodeColor(nodeId, finalColor)
+    await sleep(delay/5)
+  }
 }
 
 
@@ -194,7 +209,8 @@ async function startApprovalPOS() {
   for(var i=0; i< pendingNodes.length; i++) {
     node = pendingNodes[i]
 
-    changeNodeColor(node.id, "#DDD")
+    changeStatus('Choosing Transactions for approval')
+    await blinkNode(node.id, "#DDD", '#343')
     await sleep()
 
     var availableTips = allTips.slice(0)
@@ -202,18 +218,22 @@ async function startApprovalPOS() {
     availableTips.splice(availableTips.indexOf(tips[0]), 1)
     tips.push(weightedChoice(availableTips))
 
-    changeNodeColor(tips[0].id, BLUE)
+    changeStatus(`Node with Stake: ${tips[0].weight} selected for approval`)
+    await blinkNode(tips[0].id)
     await sleep()
 
-    changeNodeColor(tips[1].id, BLUE)
+    changeStatus(`Node with Stake: ${tips[1].weight} selected for approval`)
+    await blinkNode(tips[1].id)
     await sleep()
 
+    changeStatus('Approving Transactions')
     addEdgeToGraph(node.id, tips[0].id)
     addEdgeToGraph(node.id, tips[1].id)
     await sleep()
 
     updateNodeColor()
     s.refresh()
+    changeStatus('Idle')
     await sleep()
   }
   pendingNodes = []
@@ -223,18 +243,23 @@ updateNodeColor()
 s.refresh();
 
 document.querySelectorAll('.createTransaction').forEach(element => element.addEventListener("click", (e) => {
-  var endBatch = e.target.classList.contains('endBatch')
-  pendingNodes.push(createTransaction(endBatch))
+  pendingNodes.push(createTransaction())
   s.refresh()
 }))
 
 document.querySelector('.startApproval').addEventListener('click', (e) => {
+  endBatch()
   startApproval()
   updateNodeColor()
   s.refresh()
 })
 
 document.querySelector('.startApprovalPOS').addEventListener('click', (e) => {
+  endBatch()
   startApprovalPOS()
   s.refresh()
+})
+
+document.querySelector('#speed').addEventListener('input', (e) => {
+  delay = e.target.value
 })
